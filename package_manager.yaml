@@ -1,0 +1,10 @@
+---
+  - name: Install dependencies
+    hosts: "{{host}}"
+    tasks:
+      - yum: name={{item}} state=present update_cache=yes
+        become: yes
+        with_items:
+          - subversion
+          - ansible
+          - mailx
