@@ -1,0 +1,41 @@
+---
+
+  - set_fact:
+      userhome: "{{lookup('env','HOME')}}"
+      #upassword: "{{password}}"
+
+  - debug:
+      msg="{{userhome}}"
+
+  - set_fact:
+      assigned_group: sshuser
+
+  - name: Creating user "{{ username }}" without admin access
+    user:
+      name: "{{ username }}"
+      password: "{{ password |password_hash('sha512') }}"
+      shell: /bin/bash
+      groups: "{{user_groups.ssh_user_group}}"
+      append: yes
+
+  - name: Creating directory for user "{{ username }}"
+    file:
+      path: "/home/{{ username }}"
+      state: directory
+      owner: "{{ username }}"
+      group: "{{user_groups.ssh_user_group}}"
+      mode: '0755'
+      
+  - name: Modifying Home directory for user "{{ username }}"
+    user:
+      name: "{{ username }}"
+      home: "/home/{{ username }}"
+
+  - name: Add a line in access.conf for user "{{ username }}"
+    lineinfile:
+      path: /etc/security/access.conf
+      insertbefore: '^- : ALL : ALL'
+      line: '+ : {{ username }} : ALL'
+
+  - name: Expiring password for user "{{ username }}"
+    shell: chage -d 0 "{{ username }}"
