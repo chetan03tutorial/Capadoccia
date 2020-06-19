@@ -1,0 +1,89 @@
+---
+  - pause:
+      prompt: "Enter {{ username }} Password"
+    register: password
+
+  - set_fact:
+      userhome: "{{lookup('env','HOME')}}"
+      #upassword: "{{password}}"
+
+  - debug:
+      msg="{{userhome}}"
+
+  - set_fact:
+      upassword: "{{ password.user_input }}"
+
+  - pause:
+      prompt: "Do you want to assign {{ username }} user admin role (yes/no)?"
+      private: yes
+    register: admin    
+
+  - debug: 
+      var: admin
+
+  - debug: 
+      msg: "{{admin.user_input}}"
+
+  - set_fact:
+      assigned_role: "{{ admin.user_input }}"
+    
+  - debug: 
+      var: assigned_role
+        
+  - debug: 
+      msg: "{{assigned_role}}"
+
+  - set_fact:
+      assigned_group: sshuser
+    when: (assigned_role == false)
+
+  - set_fact:
+      assigned_group: admin
+    when: (assigned_role == true)
+
+  - debug:
+      var: assigned_group
+
+  - name: Creating user "{{ username }}" with admin access
+    user:
+      name: "{{ username }}"
+      password: "{{ upassword |password_hash('sha512') }}"
+      groups: "{{user_groups.admin_group}},{{user_groups.ssh_user_group}}"
+      append: yes
+      shell: /bin/bash
+      #createhome: 'y'
+      #home: /home/{{ username }}/
+    when: assigned_role == true
+
+  - name: Creating user "{{ username }}" without admin access
+    user:
+      name: "{{ username }}"
+      password: "{{ upassword |password_hash('sha512') }}"
+      shell: /bin/bash
+      groups: "{{user_groups.ssh_user_group}}"
+      append: yes
+      #createhome: 'y'
+      #home: /home/{{ username }}/
+    when: assigned_role == false
+
+  - name: Creating directory for user "{{ username }}"
+    file:
+      path: "/home/{{ username }}"
+      state: directory
+      owner: "{{ username }}"
+      group: "{{user_groups.ssh_user_group}}"
+      mode: '0755'
+      
+  - name: Modifying Home directory for user "{{ username }}"
+    user:
+      name: "{{ username }}"
+      home: "/home/{{ username }}"
+
+  - name: Add a line in access.conf for user "{{ username }}"
+    lineinfile:
+      path: /etc/security/access.conf
+      insertbefore: '^- : ALL : ALL'
+      line: '+ : {{ username }} : ALL'
+
+  - name: Expiring password for user "{{ username }}"
+    shell: chage -d 0 "{{ username }}"
