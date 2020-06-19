@@ -1,0 +1,16 @@
+---
+  - name: Make directories
+    hosts: "{{host}}"
+
+
+    tasks:
+
+      - name: Make required directory
+        file:
+          path: "{{item.value}}"
+          state: directory
+        with_dict: "{{directories}}"
+
+      - debug:
+          var: item.value
+        with_dict: "{{directories}}"
