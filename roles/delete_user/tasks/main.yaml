@@ -1,0 +1,24 @@
+---
+
+  - name: Modifying Home directory for user "{{ username }}"
+    user:
+      name: "{{ username }}"
+      home: "/export/home/{{ username }}"
+
+  - name: Deleting user "{{ username }}"
+    user:
+      name: "{{ username }}"
+      state: absent
+      remove: yes
+
+  - name: Delete a line in access.conf for user "{{ username }}"
+    lineinfile:
+      path: /etc/security/access.conf
+      line: '+ : {{ username }} : ALL'
+      state: absent
+      
+  - name: Remove common apps directory
+    file:
+      path: /apps/java_tdw/Linux
+      state: absent
+      recurse: no
