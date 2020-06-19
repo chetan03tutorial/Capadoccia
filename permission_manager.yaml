@@ -1,0 +1,11 @@
+---
+  - name:  Manage permission of dependency directory
+    hosts: "{{host}}"
+    tasks:
+
+      - file:
+          path: "{{item.value}}"
+          owner: "{{username}}"
+          group: "{{user_groups.ssh_user_group}}"
+          mode: '0755'
+        with_dict: "{{directories}}"
