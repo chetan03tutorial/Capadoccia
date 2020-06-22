@@ -1,0 +1,9 @@
+---
+  - name:  delete the download directory
+    hosts: "{{host}}"
+    tasks:
+
+      - name: Remove the java home directory if present
+        file:
+          path: "{{download_location}}"
+          state: absent
