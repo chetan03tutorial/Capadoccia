@@ -1,0 +1,4 @@
+sit1 ansible_ssh_host=address1 ansible_user=root ansible_ssh_pass=password ansible_connection=ssh
+sit2 ansible_ssh_host=address2 ansible_user=root ansible_ssh_pass=password ansible_connection=ssh
+sit3 ansible_ssh_host=address3 ansible_user=root ansible_ssh_pass=password ansible_connection=ssh
+
