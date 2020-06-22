@@ -1,0 +1,35 @@
+---
+  - name: Playbook to manage users
+    hosts: "{{host}}"
+
+    vars_prompt:
+      - name: role
+        prompt: "Create User (C)/ Delete User (D)"
+        private: no
+    
+      - name: uname
+        prompt: "Enter the username"
+        private: no
+
+
+
+
+    pre_tasks:
+
+      - set_fact:
+          username: "{{uname}}"
+
+    roles:
+
+      - role: create_user
+        vars:
+          username: "{{ uname }}"
+        when: role|upper  == "C"
+        
+        
+      - role: delete_user
+        vars:
+          username: "{{ uname }}"
+        when: role|upper == "D"
+        
+
