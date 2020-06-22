@@ -1,0 +1,51 @@
+---
+  - name:  Installing Java on the "{{ansible_ssh_host}}" which is a "{{env}}" environment
+    hosts: "{{host}}"
+    tasks:
+
+      - name: Remove the java home directory if present
+        file:
+          path: "{{base_dir}}/{{java_dest}}/{{java_tarname}}"
+          state: absent
+
+      - name: Create the java home directory
+        file:
+          path: "{{item}}"
+          state: directory
+          mode: '0755'
+          group: "{{user_groups.ssh_user_group}}"
+        with_items:
+          - "{{base_dir}}/{{java_dest}}"
+          - "{{download_location}}"
+
+      - debug:
+          msg: "{{ ce_svn.repo }}/{{ svn_java }}"
+
+      - name: Download java tar file
+        subversion:
+          export: "{{ ce_svn.export }}"
+          repo: "{{ ce_svn.repo }}/{{ svn_java }}"
+          dest: "{{download_location}}"
+          force: "{{ ce_svn.force }}"
+          username: "{{ svn_user }}"
+          password: "{{ svn_pass }}"
+
+      - name: Unarchive java tar file
+        unarchive:
+          src: "{{download_location}}/{{java_tarname}}.tar"
+          dest: "{{base_dir}}/{{ java_dest }}"
+          list_files: yes
+          remote_src: yes
+
+
+      - name: Set JAVA HOME
+        lineinfile:
+          dest: ~/.bashrc
+          line: 'JAVA_HOME="{{java_home}}" PATH=$PATH:$JAVA_HOME/bin'
+          insertafter: 'EOF'
+          state: present
+
+
+      - name: Load library path and oracle home
+        shell: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$JAVA_HOME/lib:$JAVA_HOME
+
