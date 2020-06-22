@@ -1,0 +1,9 @@
+GBMAPPSIT1 ansible_ssh_host=host_address1
+GBMAPPSIT2 ansible_ssh_host=host_address2
+GBMAPPSIT3 ansible_ssh_host=host_address3
+
+[sits]
+GBMAPPSIT1
+GBMAPPSIT2
+GBMAPPSIT3
+
