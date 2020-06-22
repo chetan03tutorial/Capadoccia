@@ -1,0 +1,14 @@
+---
+
+  - name: Run playbook to install java
+    import_playbook: java_setup.yaml
+
+  - name: Run playbook to install java
+    import_playbook: oracle_setup.yaml
+
+  - name: Run playbook to install Geneos
+    import_playbook: netprobe.yaml
+
+  - name: Clean up
+    import_playbook: cleanup.yaml
+
