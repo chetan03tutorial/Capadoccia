@@ -1,0 +1,41 @@
+---
+  svn_path:
+    repo: "repo_address"
+    export: yes
+    force: yes
+
+  directories:
+    binary_dir: /opt/app/bin
+    geneos_dir: /opt/app/geneos
+    log_dir: /opt/app/logs
+    download_dir: /opt/app/bin/download
+
+
+  user_groups:
+    admin_group: admin
+    ssh_user_group: sshuser
+
+  base_dir: "{{directories.binary_dir}}"
+  download_location: "{{directories.download_dir}}"
+  ansible_logpath: "{{directories.log_dir}}"
+  svn_user: svn_user
+  svn_pass: password
+  svn_geneos: geneos
+  svn_java: "java/java1.6.0_24"
+  svn_oracle: "oracle/18.3"
+
+  java_tarname: "jdk1.6.0_24"
+  oracle_tarname: "oracle"
+  geneos_dest: "{{directories.geneos_dir}}"
+  java_dest: "java"
+  oracle_dest: "oracle"
+  oracle_version: "18.3"
+  oracle_client_dir: "client64"
+  oracle_home: "{{base_dir}}/{{oracle_dest}}/{{oracle_version}}/{{oracle_client_dir}}"
+  java_home: "{{base_dir}}/{{java_dest}}/{{java_tarname}}"
+  geneos_tar_file: "netprobe"
+
+  application_user: "{{ansible_user}}"
+  netprobe_file: "netprobe/script/netprobes_{{ application_user }}.txt"
+
+
