@@ -1,0 +1,15 @@
+---
+  #- name: Adore the machine with Java/Oracle/Netprobe/Ansible/Subversion/MailX Client dependencies
+   # hosts: "{{ host }}"
+
+  - name: Install the dependencies
+    import_playbook: dependencies_resolver.yaml
+
+  - name: Run playbook to create a user
+    import_playbook: service_account_facilitator.yaml
+
+  - name: Create required placards
+    import_playbook: placard_producer.yaml
+
+  - name: Change the permission on dependencies
+    import_playbook: manage_permission.yaml
