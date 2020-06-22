@@ -1,0 +1,41 @@
+---
+  - name: Deploy geneos netprobe
+    hosts: "{{host}}"
+    tasks:
+
+      #- name: Remove the geneos home directory
+        #file:
+          #path: "{{geneos_dest}}"
+          #state: absent
+
+      #- name: Create the geneos directory
+        #file:
+          #path: "{{item}}"
+          #state: directory
+          #group: "{{user_groups.ssh_user_group}}"
+          #owner: "{{ application_user }}"
+          #mode: '0755'
+        #with_items:
+          #- "{{geneos_dest}}"
+
+
+      - name: Export geneos tar file
+        subversion:
+          export: "{{ ce_svn.export }}"
+          repo: "{{ ce_svn.repo }}/{{ svn_geneos }}"
+          dest: "{{ download_location }}"
+          force: "{{ ce_svn.force }}"
+          username: "{{ svn_user }}"
+          password: "{{ svn_pass }}"
+
+      - name: Unarchive geneos tar file
+        unarchive:
+          src: "{{ download_location }}/{{ geneos_tar_file }}.tar"
+          dest: "{{ geneos_dest }}"
+          remote_src: yes
+
+      - name: Create netprobes_application_user file under script directory
+        copy:
+          dest: "{{ geneos_dest }}/{{ netprobe_file }}"
+          content: |
+            {{ application_user }}:7036:default
