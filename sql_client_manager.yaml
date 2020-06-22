@@ -1,0 +1,67 @@
+---
+  - name: Setting up the Oracle HOME and LD Library Path
+    hosts: "{{host}}"
+    tasks:
+
+      - debug:
+          var: oracle_home
+
+      - name: Remove the oracle home directory if present
+        file:
+          path: "{{base_dir}}/{{svn_oracle}}"
+          state: absent
+
+      - name: Create the oracle home directory
+        file:
+          path: "{{base_dir}}/{{oracle_dest}}"
+          state: directory
+          owner: "{{ application_user }}"
+          group: "{{user_groups.ssh_user_group}}"
+          mode: '0755'
+
+      - name: Download oracle tar file
+        subversion:
+          export: "{{ ce_svn.export }}"
+          repo: "{{ ce_svn.repo }}/{{svn_oracle}}/"
+          dest: "{{download_location}}"
+          force: "{{ ce_svn.force }}"
+          username: "{{ svn_user }}"
+          password: "{{ svn_pass }}"
+
+      - name: Unarchive oracle tar file
+        unarchive:
+          src: "{{download_location}}/{{oracle_tarname}}.tar"
+          dest: "{{base_dir}}"
+          list_files: yes
+          remote_src: yes
+
+      - name: Set Oracle HOME
+        tags:
+          - set_oracle_home
+        lineinfile:
+          dest: ~/.bashrc
+          line: 'ORACLE_HOME="{{oracle_home}}" PATH=$PATH:$ORACLE_HOME/bin'
+          insertafter: 'EOF'
+          state: present
+
+      - name: Set Library Path
+        tags:
+          - set_ld_lib_path
+        lineinfile:
+          dest: ~/.bashrc
+          line: 'LD_LIBRARY_PATH=$ORACLE_HOME/lib'
+          insertafter: 'EOF'
+          state: present
+
+      - name: Set TNS Admin
+        tags:
+          - set_tns_admin
+        lineinfile:
+          dest: ~/.bashrc
+          line: 'TNS_ADMIN=$ORACLE_HOME/lib/network/admin'
+          insertafter: 'EOF'
+          state: present
+
+      - name: Load library path and oracle home
+        shell: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ORACLE_HOME/lib:$ORACLE_HOME
+
