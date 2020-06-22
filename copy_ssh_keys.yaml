@@ -1,0 +1,19 @@
+---
+  - name:  Copy SSH Keys to Remote Server
+    hosts: app
+    #vars_prompt:
+    #  - name: svn_user
+    #    prompt: "SVN Username"
+    #    private: no
+    
+    #  - name: svn_pass
+    #    prompt: "SVN Password"
+    
+    pre_tasks:
+      - debug:
+          msg: "{{ are_app_user }}"
+        
+    roles:
+      - role: copy_ssh_keys
+        vars:
+          application_user: "{{ are_app_user }}"
